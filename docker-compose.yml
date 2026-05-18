@@ -1,0 +1,170 @@
+version: "3.9"
+
+services:
+  sentinelforge-api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: sentinelforge-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - sf-data:/app/data
+      - sf-logs:/app/logs
+      - ./configs:/app/configs:ro
+    env_file:
+      - .env
+    environment:
+      - SF_ENVIRONMENT=production
+      - SF_SIMULATION_MODE=true
+      - SF_LLM__PROVIDER=ollama
+      - SF_LLM__BASE_URL=http://ollama:11434
+      - SF_AUTH__ENABLED=true
+      - SF_API__RATE_LIMIT_PER_MINUTE=60
+      - SF_API__CORS_ORIGINS=["http://localhost:8501"]
+    depends_on:
+      ollama:
+        condition: service_started
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=100M,noexec,nosuid
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1G
+        reservations:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - sentinelforge-net
+
+  sentinelforge-worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: sentinelforge-worker
+    command: ["python", "-m", "sentinelforge.cli", "run", "--scenario", "brute_force"]
+    volumes:
+      - sf-data:/app/data
+      - sf-logs:/app/logs
+      - ./configs:/app/configs:ro
+    env_file:
+      - .env
+    environment:
+      - SF_ENVIRONMENT=production
+      - SF_SIMULATION_MODE=true
+      - SF_LLM__PROVIDER=ollama
+      - SF_LLM__BASE_URL=http://ollama:11434
+    depends_on:
+      sentinelforge-api:
+        condition: service_healthy
+    restart: "no"
+    read_only: true
+    tmpfs:
+      - /tmp:size=100M,noexec,nosuid
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1G
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - sentinelforge-net
+
+  sentinelforge-dashboard:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: sentinelforge-dashboard
+    command: ["python", "-m", "sentinelforge.cli", "dashboard"]
+    ports:
+      - "8501:8501"
+    volumes:
+      - sf-data:/app/data:ro
+      - sf-logs:/app/logs:ro
+    env_file:
+      - .env
+    environment:
+      - SF_ENVIRONMENT=production
+    depends_on:
+      sentinelforge-api:
+        condition: service_healthy
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=100M,noexec,nosuid
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - sentinelforge-net
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: sentinelforge-ollama
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 8G
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - sentinelforge-net
+
+volumes:
+  sf-data:
+  sf-logs:
+  ollama-models:
+
+networks:
+  sentinelforge-net:
+    driver: bridge
+    internal: false

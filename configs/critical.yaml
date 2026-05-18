@@ -1,0 +1,91 @@
+# SentinelForge — Critical Infrastructure Configuration
+# Maximum safety, minimum autonomy. Every action requires human approval.
+# Designed for air-gapped or high-security environments.
+
+project_name: SentinelForge
+environment: critical
+debug: false
+simulation_mode: false
+aggressiveness: passive  # Alert only — never auto-contain
+
+llm:
+  provider: ollama  # Local LLM only — never use cloud APIs
+  model: llama3.1:8b
+  base_url: http://localhost:11434
+  api_key: ""
+  temperature: 0.01
+  max_tokens: 4096
+
+safety:
+  human_approval_required: true  # ALWAYS
+  max_actions_per_minute: 3
+  allowed_containment_actions:
+    - block_ip
+    - isolate_host
+  blocked_actions:
+    - wipe_disk
+    - shutdown_network
+    - delete_logs
+    - format_drive
+    - disable_firewall
+    - modify_acl
+    - reset_password
+    - disable_account
+    - restart_service
+  prompt_injection_detection: true
+  sandbox_mode: false
+
+monitor:
+  log_sources:
+    - syslog
+    - file
+  poll_interval_seconds: 5
+  anomaly_threshold: 0.6  # Lower threshold = more sensitive
+  log_file_paths:
+    - /var/log/auth.log
+    - /var/log/syslog
+    - /var/log/kern.log
+  enable_windows_events: true
+  enable_sysmon: true
+  enable_file_integrity: true
+  file_integrity_paths:
+    - /etc
+    - /usr/bin
+    - /usr/sbin
+    - /boot
+    - C:\Windows\System32
+  enable_network_monitor: true
+  network_alert_threshold_mbps: 25.0  # Very sensitive
+
+auth:
+  enabled: true
+  token_expiry_seconds: 1800  # Short sessions
+  require_auth_for_api: true
+
+api:
+  host: "127.0.0.1"  # Local only — never expose externally
+  port: 8000
+  rate_limit_per_minute: 20
+  cors_origins: []  # No CORS
+
+logging:
+  level: DEBUG
+  log_to_file: true
+  log_file_path: /var/log/sentinelforge/sentinelforge.log
+  log_max_size_mb: 100
+  log_backup_count: 10
+
+health:
+  enable_self_monitor: true
+  cpu_alert_percent: 80.0
+  memory_alert_percent: 75.0
+  check_interval_seconds: 15
+
+connectors:
+  siem_type: elasticsearch
+  siem_url: http://localhost:9200
+  threat_intel_feeds:
+    - misp_local  # Local only
+
+vector_db_path: /var/lib/sentinelforge/vector_db
+audit_log_path: /var/log/sentinelforge/audit.log

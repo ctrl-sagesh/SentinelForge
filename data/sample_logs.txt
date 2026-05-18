@@ -1,0 +1,10 @@
+2026-05-17T10:00:01Z sshd[1234]: Failed password for root from 203.0.113.42 port 50001 ssh2
+2026-05-17T10:00:02Z sshd[1234]: Failed password for root from 203.0.113.42 port 50002 ssh2
+2026-05-17T10:00:03Z sshd[1234]: Failed password for root from 203.0.113.42 port 50003 ssh2
+2026-05-17T10:00:04Z sshd[1234]: Failed password for root from 203.0.113.42 port 50004 ssh2
+2026-05-17T10:00:05Z sshd[1234]: Failed password for root from 203.0.113.42 port 50005 ssh2
+2026-05-17T10:00:10Z sshd[1234]: Accepted password for root from 203.0.113.42 port 50006 ssh2
+2026-05-17T10:01:00Z kernel: suspicious process: mimikatz.exe launched by user admin
+2026-05-17T10:02:00Z firewall: large upload detected from 10.0.1.50 to 198.51.100.77 (500MB)
+2026-05-17T10:03:00Z sudo: user jdoe executed sudo su root on workstation-42
+2026-05-17T10:04:00Z smbclient: net use \\10.0.1.100\C$ from 10.0.1.50 by DOMAIN\admin

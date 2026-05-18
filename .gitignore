@@ -1,0 +1,52 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+.env
+*.env.local
+*.env.production
+
+# Logs
+logs/
+*.log
+
+# Data (keep sample, ignore runtime)
+data/vector_db/
+data/audit.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Database runtime
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
+# Secrets - never commit
+*.pem
+*.key
+secrets/

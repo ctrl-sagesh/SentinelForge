@@ -1,0 +1,36 @@
+{
+  "iocs": {
+    "203.0.113.42": {
+      "malicious": true,
+      "tags": ["brute_force", "ssh_scanner"],
+      "last_seen": "2026-05-17",
+      "source": "internal_honeypot"
+    },
+    "198.51.100.77": {
+      "malicious": true,
+      "tags": ["c2_server", "malware_distribution"],
+      "last_seen": "2026-05-16",
+      "source": "threat_feed"
+    },
+    "192.0.2.100": {
+      "malicious": true,
+      "tags": ["phishing", "credential_harvesting"],
+      "last_seen": "2026-05-15",
+      "source": "community_report"
+    }
+  },
+  "pulses": [
+    {
+      "name": "SSH Brute Force Campaign Q2 2026",
+      "description": "Active SSH brute force campaign targeting cloud infrastructure",
+      "indicators": ["203.0.113.0/24"],
+      "mitre": ["T1110"]
+    },
+    {
+      "name": "Ransomware Deployment via Macro",
+      "description": "Phishing campaign delivering ransomware through Office macros",
+      "indicators": ["198.51.100.77"],
+      "mitre": ["T1566", "T1059", "T1486"]
+    }
+  ]
+}

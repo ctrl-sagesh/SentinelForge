@@ -1,0 +1,76 @@
+# SentinelForge — Home Lab / Personal Network Configuration
+# For monitoring your home network, personal servers, or lab environment.
+
+project_name: SentinelForge
+environment: homelab
+debug: false
+simulation_mode: false
+aggressiveness: moderate
+
+llm:
+  provider: ollama
+  model: llama3.1:8b
+  base_url: http://localhost:11434
+  api_key: ""
+  temperature: 0.1
+  max_tokens: 4096
+
+safety:
+  human_approval_required: true
+  max_actions_per_minute: 10
+  allowed_containment_actions:
+    - block_ip
+    - isolate_host
+    - disable_account
+  blocked_actions:
+    - wipe_disk
+    - shutdown_network
+    - delete_logs
+    - format_drive
+    - disable_firewall
+  prompt_injection_detection: true
+  sandbox_mode: false
+
+monitor:
+  log_sources:
+    - file
+  poll_interval_seconds: 10
+  anomaly_threshold: 0.7
+  log_file_paths:
+    - /var/log/auth.log
+    - /var/log/syslog
+  enable_windows_events: false
+  enable_sysmon: false
+  enable_file_integrity: true
+  file_integrity_paths:
+    - /etc
+    - /usr/bin
+    - /usr/sbin
+  enable_network_monitor: true
+  network_alert_threshold_mbps: 50.0
+
+auth:
+  enabled: false
+  dashboard_password: changeme
+
+api:
+  host: "127.0.0.1"
+  port: 8000
+  rate_limit_per_minute: 30
+  cors_origins:
+    - "http://localhost:8501"
+
+logging:
+  level: INFO
+  log_to_file: true
+  log_file_path: ./logs/sentinelforge.log
+  log_max_size_mb: 25
+  log_backup_count: 3
+
+connectors:
+  siem_type: none
+  threat_intel_feeds:
+    - misp_local
+
+vector_db_path: ./data/vector_db
+audit_log_path: ./data/audit.log

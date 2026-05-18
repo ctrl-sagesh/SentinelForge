@@ -1,0 +1,53 @@
+## SentinelForge Production Configuration
+## WARNING: Review all settings carefully before deploying.
+
+project_name: SentinelForge
+environment: production
+debug: false
+simulation_mode: false
+
+aggressiveness: moderate
+
+llm:
+  provider: ollama
+  model: llama3.1:8b
+  base_url: http://ollama:11434
+  api_key: ""
+  temperature: 0.05
+  max_tokens: 4096
+
+safety:
+  human_approval_required: true
+  max_actions_per_minute: 5
+  allowed_containment_actions:
+    - block_ip
+    - isolate_host
+    - disable_account
+  blocked_actions:
+    - wipe_disk
+    - shutdown_network
+    - delete_logs
+    - format_drive
+    - disable_firewall
+    - modify_acl
+    - reset_password
+  prompt_injection_detection: true
+  sandbox_mode: false
+
+monitor:
+  log_sources:
+    - syslog
+    - file
+  poll_interval_seconds: 10
+  anomaly_threshold: 0.8
+
+connectors:
+  siem_type: elasticsearch
+  siem_url: http://elasticsearch:9200
+  siem_api_key: ""
+  threat_intel_feeds:
+    - otx
+    - misp_local
+
+vector_db_path: /var/lib/sentinelforge/vector_db
+audit_log_path: /var/log/sentinelforge/audit.log
