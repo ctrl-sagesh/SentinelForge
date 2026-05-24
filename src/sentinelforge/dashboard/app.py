@@ -128,7 +128,7 @@ st.markdown("""
 # --- Auth Gate ---
 def check_auth() -> bool:
     password = os.environ.get("SF_DASHBOARD_PASSWORD", "")
-    if not password or password == "changeme":
+    if not password or password == "changeme":  # noqa: S105
         return True
     if st.session_state.get("authenticated"):
         return True
@@ -204,8 +204,8 @@ def _load_audit_entries(source: str = "auto") -> list[dict]:
         if db:
             try:
                 return db.get_audit_entries(limit=200)
-            except Exception:
-                pass
+            except Exception:  # noqa: S110
+                pass  # Graceful fallback to file
     p = Path("./data/audit.log")
     if not p.exists():
         return []
@@ -224,8 +224,8 @@ def _load_db_events(hours: int = 24) -> list[dict]:
     if db:
         try:
             return db.get_recent_events(hours=hours, limit=200)
-        except Exception:
-            pass
+        except Exception:  # noqa: S110
+            pass  # Graceful fallback
     return []
 
 
@@ -234,8 +234,8 @@ def _load_db_reports() -> list[dict]:
     if db:
         try:
             return db.get_reports(limit=50)
-        except Exception:
-            pass
+        except Exception:  # noqa: S110
+            pass  # Graceful fallback
     return []
 
 
@@ -244,8 +244,8 @@ def _load_db_pending_approvals() -> list[dict]:
     if db:
         try:
             return db.get_pending_approvals()
-        except Exception:
-            pass
+        except Exception:  # noqa: S110
+            pass  # Graceful fallback
     return []
 
 
@@ -254,8 +254,8 @@ def _resolve_approval(action_id: str, approved: bool, decided_by: str) -> None:
     if db:
         try:
             db.resolve_approval(action_id, approved, decided_by)
-        except Exception:
-            pass
+        except Exception:  # noqa: S110
+            pass  # Best-effort persistence
 
 
 # --- Sidebar ---
@@ -328,7 +328,7 @@ if result:
         ("Violations", len(result.safety_violations), "#da3633" if result.safety_violations else "#238636"),
         ("Escalations", len(result.human_escalations), "#d29922" if result.human_escalations else "#238636"),
     ]
-    for col, (label, value, color) in zip(cols, metrics):
+    for col, (label, value, color) in zip(cols, metrics, strict=False):
         col.markdown(metric_card(label, value, color), unsafe_allow_html=True)
 elif db_events:
     cols = st.columns(4)

@@ -92,22 +92,22 @@ class MonitorAgent(BaseAgent):
             try:
                 from sentinelforge.monitoring.windows_events import WindowsEventReader
                 self._windows_reader = WindowsEventReader()
-            except Exception:
-                pass
+            except Exception as exc:
+                self.logger.debug("windows_events_unavailable", error=str(exc))
 
         if cfg.enable_file_integrity and cfg.file_integrity_paths:
             try:
                 from sentinelforge.monitoring.file_integrity import FileIntegrityMonitor
                 self._file_integrity = FileIntegrityMonitor(cfg.file_integrity_paths)
-            except Exception:
-                pass
+            except Exception as exc:
+                self.logger.debug("file_integrity_unavailable", error=str(exc))
 
         if cfg.enable_network_monitor:
             try:
                 from sentinelforge.monitoring.network import NetworkMonitor
                 self._network_monitor = NetworkMonitor(cfg.network_alert_threshold_mbps)
-            except Exception:
-                pass
+            except Exception as exc:
+                self.logger.debug("network_monitor_unavailable", error=str(exc))
 
     async def run(self, state: OrchestratorState) -> OrchestratorState:
         self.logger.info("monitor_cycle_start", iteration=state.iteration)

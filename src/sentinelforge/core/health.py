@@ -100,8 +100,8 @@ class HealthMonitor:
             status.disk_percent = disk.percent
             if disk.percent > 90:
                 status.warnings.append(f"Disk usage high: {disk.percent:.1f}%")
-        except Exception:
-            pass
+        except Exception:  # noqa: S110
+            pass  # Disk check is optional, failure is non-critical
 
     def record_heartbeat(self, agent_name: str) -> None:
         self._agent_heartbeats[agent_name] = time.monotonic()

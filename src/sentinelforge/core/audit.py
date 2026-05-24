@@ -27,9 +27,10 @@ class AuditLogger:
             return "GENESIS"
         try:
             with open(self._path, "rb") as f:
-                for line in f:
-                    pass
-                last = json.loads(line.decode())
+                last_line = b""
+                for current_line in f:
+                    last_line = current_line
+                last = json.loads(last_line.decode())
                 return last.get("entry_hash", "GENESIS")
         except Exception:
             return "GENESIS"
@@ -61,8 +62,8 @@ class AuditLogger:
             from sentinelforge.core.database import get_database
             db = get_database()
             db.save_audit_entry(entry.model_dump(mode="json"))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("audit_db_write_failed", error=str(exc))
 
         logger.info(
             "audit_entry",

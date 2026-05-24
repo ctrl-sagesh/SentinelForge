@@ -61,6 +61,26 @@ line-length = 100
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "S", "B"]
 
+[tool.ruff.lint.per-file-ignores]
+"src/sentinelforge/api/server.py" = ["B008", "E501"]
+"src/sentinelforge/core/knowledge.py" = ["E501"]
+"src/sentinelforge/core/safety.py" = ["E501"]
+"src/sentinelforge/core/config.py" = ["E501", "S104", "S105"]
+"src/sentinelforge/core/executors.py" = ["E501", "S603"]
+"src/sentinelforge/core/guardrails.py" = ["E501"]
+"src/sentinelforge/core/alerting.py" = ["E501", "S104"]
+"src/sentinelforge/core/database.py" = ["E501"]
+"src/sentinelforge/agents/explainer.py" = ["E501"]
+"src/sentinelforge/agents/monitor.py" = ["E501"]
+"src/sentinelforge/dashboard/app.py" = ["E501"]
+"src/sentinelforge/cli.py" = ["E501", "S104"]
+"src/sentinelforge/evaluation/harness.py" = ["E501"]
+"tests/*.py" = ["S101", "S104", "S106", "S108", "E501"]
+"src/sentinelforge/core/models.py" = ["E501"]
+"src/sentinelforge/knowledge/vector_store.py" = ["E501"]
+"src/sentinelforge/monitoring/*.py" = ["E501"]
+"src/sentinelforge/simulation/*.py" = ["E501"]
+
 [tool.mypy]
 python_version = "3.11"
 strict = true

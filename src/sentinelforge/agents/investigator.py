@@ -92,7 +92,6 @@ class InvestigatorAgent(BaseAgent):
 
     async def _investigate_group(self, events: list[ThreatEvent]) -> Investigation:
         event_ids = [e.id for e in events]
-        max_severity = max(events, key=lambda e: self._severity_rank(e.severity))
 
         all_iocs: list[str] = []
         all_mitre: list[str] = []
@@ -119,7 +118,10 @@ class InvestigatorAgent(BaseAgent):
 
         recurrence = self._check_recurrence(events)
         if recurrence > 0:
-            inv.reasoning_trace.append(f"Cross-run correlation: {recurrence} prior events from same source in last 24h")
+            inv.reasoning_trace.append(
+                f"Cross-run correlation: {recurrence} prior events"
+                " from same source in last 24h"
+            )
             if recurrence >= 5 and self._severity_rank(inv.severity) < 3:
                 inv.severity = Severity.HIGH
                 inv.reasoning_trace.append("Severity escalated to HIGH due to repeated activity")
@@ -151,8 +153,14 @@ class InvestigatorAgent(BaseAgent):
 
         return Investigation(
             event_ids=event_ids,
-            summary=f"Correlated incident: {', '.join(set(e.event_type for e in events))}",
-            root_cause=f"Detected {events[0].event_type} activity from {events[0].source_ip or 'unknown source'}",
+            summary=(
+                "Correlated incident: "
+                f"{', '.join(set(e.event_type for e in events))}"
+            ),
+            root_cause=(
+                f"Detected {events[0].event_type} activity"
+                f" from {events[0].source_ip or 'unknown source'}"
+            ),
             affected_assets=list(set(all_assets)),
             mitre_techniques=list(set(all_mitre)),
             severity=max_severity.severity,
@@ -230,8 +238,8 @@ class InvestigatorAgent(BaseAgent):
                     f"- {r['document']}" for r in results
                 )
                 return context
-        except Exception:
-            pass
+        except Exception as exc:  # noqa: F841
+            self.logger.debug("kb_lookup_failed", error=str(exc))
         return ""
 
     def _check_recurrence(self, events: list[ThreatEvent]) -> int:
@@ -259,7 +267,7 @@ def _parse_llm_json(content: str) -> dict[str, Any]:
     content = content.strip()
     if content.startswith("```"):
         lines = content.split("\n")
-        lines = [l for l in lines if not l.strip().startswith("```")]
+        lines = [line for line in lines if not line.strip().startswith("```")]
         content = "\n".join(lines)
 
     try:
@@ -272,7 +280,9 @@ def _parse_llm_json(content: str) -> dict[str, Any]:
                 return json.loads(content[start:end])
             except json.JSONDecodeError:
                 pass
-        raise ValueError(f"LLM returned non-JSON response: {content[:200]}")
+        raise ValueError(  # noqa: B904
+            f"LLM returned non-JSON response: {content[:200]}"
+        ) from None
 
 
 def _safe_list(value: Any) -> list[str]:

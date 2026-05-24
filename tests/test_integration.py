@@ -170,7 +170,7 @@ class TestDatabasePersistence:
     @pytest.mark.asyncio
     async def test_audit_entries_created(self, settings, tmp_path):
         settings.audit_log_path = str(tmp_path / "audit.log")
-        result = await run_defense_cycle(
+        await run_defense_cycle(
             settings=settings,
             initial_state=_brute_force_state(),
             use_llm=False,

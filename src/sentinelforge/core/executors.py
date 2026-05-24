@@ -49,7 +49,7 @@ def _validate_ip(ip: str) -> bool:
 
 def _validate_not_self(ip: str) -> bool:
     """Prevent blocking localhost or common self-addresses."""
-    blocked = {"127.0.0.1", "0.0.0.0", "::1", "localhost"}
+    blocked = {"127.0.0.1", "0.0.0.0", "::1", "localhost"}  # noqa: S104
     return ip not in blocked
 
 

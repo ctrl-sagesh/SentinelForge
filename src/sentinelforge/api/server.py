@@ -78,8 +78,8 @@ bearer_scheme = HTTPBearer(auto_error=False)
 
 
 async def get_current_user(
-    api_key: str | None = Security(api_key_header),
-    bearer: HTTPAuthorizationCredentials | None = Security(bearer_scheme),
+    api_key: str | None = Security(api_key_header),  # noqa: B008
+    bearer: HTTPAuthorizationCredentials | None = Security(bearer_scheme),  # noqa: B008
 ):
     """Authenticate via API key or JWT bearer token."""
     settings = get_settings()

@@ -21,7 +21,7 @@ from sentinelforge.core.safety import get_safety_engine
 
 EXECUTIVE_SCHEMA = """{
   "title": "string — incident title",
-  "executive_summary": "string — 2-3 sentence plain-language summary for non-technical stakeholders",
+  "executive_summary": "string — 2-3 sentence summary",
   "business_impact": "string — what this means for the organization",
   "recommendations": ["string — actionable next steps in plain language"]
 }"""

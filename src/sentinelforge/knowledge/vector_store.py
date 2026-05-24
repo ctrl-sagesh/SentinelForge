@@ -30,8 +30,8 @@ class ThreatKnowledgeBase:
                 name="threat_knowledge",
                 metadata={"hnsw:space": "cosine"},
             )
-        except ImportError:
-            raise RuntimeError("Install chromadb: pip install chromadb")
+        except ImportError as exc:
+            raise RuntimeError("Install chromadb: pip install chromadb") from exc
 
     def add_knowledge(
         self,

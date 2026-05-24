@@ -28,7 +28,7 @@ def main() -> None:
     audit_p.add_argument("--export", choices=["csv"], help="Export audit log as CSV")
     audit_p.add_argument("--since", type=str, default=None, help="Time range (e.g. 24h, 7d)")
 
-    seed_p = sub.add_parser("seed", help="Seed the knowledge base")
+    sub.add_parser("seed", help="Seed the knowledge base")
 
     args = parser.parse_args()
 
