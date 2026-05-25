@@ -50,3 +50,6 @@ data/*.db-shm
 *.pem
 *.key
 secrets/
+download.htm
+*.htm
+SentinelForge_Project_Info.txt

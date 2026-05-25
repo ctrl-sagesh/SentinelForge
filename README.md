@@ -10,6 +10,17 @@ Built for small-to-medium SOC teams, critical infrastructure operators, and secu
 
 ---
 
+## Quick Demo
+
+```bash
+pip install sentinelforge
+sentinelforge demo
+```
+
+Open http://localhost:8501 to see the live dashboard with sample threat data.
+
+---
+
 ## Architecture
 
 ```mermaid
@@ -182,19 +193,23 @@ Client Request
 - Docker & Docker Compose (optional, for containerized deployment)
 - Ollama (optional, for local LLM — the framework works without LLM in rule-based mode)
 
-### Installation
+### Install from PyPI
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-org/sentinelforge.git
-cd sentinelforge
+pip install sentinelforge
+```
 
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Linux/Mac
-# .venv\Scripts\activate   # Windows
+To include all optional extras (dashboard, LLM providers, dev tools):
 
-# Install with all optional dependencies
+```bash
+pip install "sentinelforge[all]"
+```
+
+### Alternative: Install from Source
+
+```bash
+git clone https://github.com/ctrl-sagesh/SentinelForge.git
+cd SentinelForge
 pip install -e ".[all]"
 ```
 

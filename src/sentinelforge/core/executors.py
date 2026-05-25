@@ -53,6 +53,14 @@ def _validate_not_self(ip: str) -> bool:
     return ip not in blocked
 
 
+def _check_demo_mode() -> ExecutionResult | None:
+    """Return a skip result if demo mode is active."""
+    import os
+    if os.environ.get("SENTINELFORGE_DEMO_MODE") == "true":
+        return ExecutionResult(True, "Demo mode: skipping real execution", "")
+    return None
+
+
 def _run_command(args: list[str], timeout: int = 30) -> tuple[bool, str]:
     """Run a subprocess safely — never uses shell=True."""
     try:
@@ -80,6 +88,9 @@ def _run_command(args: list[str], timeout: int = 30) -> tuple[bool, str]:
 
 def block_ip(ip: str, canary: bool = False, timeout: int = 30) -> ExecutionResult:
     """Block an IP address via Windows Firewall or Linux iptables."""
+    demo = _check_demo_mode()
+    if demo:
+        return demo
     if not _validate_ip(ip):
         return ExecutionResult(False, f"Invalid IP: {ip}", "")
     if not _validate_not_self(ip):
@@ -131,6 +142,9 @@ def unblock_ip(ip: str, timeout: int = 30) -> ExecutionResult:
 
 def kill_process(target: str, canary: bool = False, timeout: int = 15) -> ExecutionResult:
     """Kill a process by PID or name. Validates input strictly."""
+    demo = _check_demo_mode()
+    if demo:
+        return demo
     by_pid = PID_PATTERN.match(target)
 
     if by_pid:
@@ -173,6 +187,9 @@ def kill_process(target: str, canary: bool = False, timeout: int = 15) -> Execut
 
 def disable_account(username: str, canary: bool = False, timeout: int = 15) -> ExecutionResult:
     """Disable a local user account."""
+    demo = _check_demo_mode()
+    if demo:
+        return demo
     if not USERNAME_PATTERN.match(username):
         return ExecutionResult(False, f"Invalid username: {username}", "")
 
@@ -219,6 +236,9 @@ QUARANTINE_DIR = Path("./data/quarantine")
 
 def quarantine_file(file_path: str, canary: bool = False) -> ExecutionResult:
     """Move a suspicious file to quarantine directory."""
+    demo = _check_demo_mode()
+    if demo:
+        return demo
     if PATH_FORBIDDEN.search(file_path):
         return ExecutionResult(False, f"Forbidden characters in path: {file_path}", "")
 
@@ -285,6 +305,9 @@ def isolate_host(hostname: str, canary: bool = False, timeout: int = 30) -> Exec
     """Isolate a host by blocking all traffic to/from it.
     On Windows: adds firewall rules. On Linux: iptables rules.
     """
+    demo = _check_demo_mode()
+    if demo:
+        return demo
     if _validate_ip(hostname):
         ip = hostname
     elif HOSTNAME_PATTERN.match(hostname):

@@ -29,6 +29,7 @@ def main() -> None:
     audit_p.add_argument("--since", type=str, default=None, help="Time range (e.g. 24h, 7d)")
 
     sub.add_parser("seed", help="Seed the knowledge base")
+    sub.add_parser("demo", help="Launch dashboard with sample threat data")
 
     args = parser.parse_args()
 
@@ -44,6 +45,8 @@ def main() -> None:
         _cmd_audit(args)
     elif args.command == "seed":
         _cmd_seed()
+    elif args.command == "demo":
+        _cmd_demo()
     else:
         parser.print_help()
 
@@ -161,6 +164,97 @@ def _cmd_audit(args: argparse.Namespace) -> None:
             print(f"  [{e.get('status')}] {e.get('agent')} — {e.get('action')} {e.get('timestamp','')}")
     else:
         print("Usage: sentinelforge audit --verify | --export csv [--since 24h]")
+
+
+def _cmd_demo() -> None:
+    import os
+    import subprocess
+    from datetime import datetime, timedelta, timezone
+
+    os.environ["SENTINELFORGE_DEMO_MODE"] = "true"
+    os.environ["SF_SIMULATION_MODE"] = "true"
+
+    print("Seeding demo data...")
+
+    from sentinelforge.core.database import get_database
+    from sentinelforge.core.models import Severity
+
+    db = get_database()
+    now = datetime.now(timezone.utc)
+
+    demo_events = [
+        {"event_type": "brute_force", "severity": "high", "source_ip": "203.0.113.42",
+         "dest_ip": "10.0.1.50", "description": "Multiple failed SSH login attempts",
+         "hours_ago": 2},
+        {"event_type": "brute_force", "severity": "high", "source_ip": "203.0.113.42",
+         "dest_ip": "10.0.1.50", "description": "Continued SSH brute force — 50+ attempts",
+         "hours_ago": 1.5},
+        {"event_type": "brute_force", "severity": "critical", "source_ip": "198.51.100.10",
+         "dest_ip": "10.0.1.20", "description": "RDP brute force from known bad IP",
+         "hours_ago": 12},
+        {"event_type": "port_scan", "severity": "medium", "source_ip": "192.0.2.55",
+         "dest_ip": "10.0.1.0", "description": "SYN scan on ports 1-1024",
+         "hours_ago": 24},
+        {"event_type": "port_scan", "severity": "medium", "source_ip": "203.0.113.42",
+         "dest_ip": "10.0.1.50", "description": "Service enumeration scan detected",
+         "hours_ago": 3},
+        {"event_type": "suspicious_process", "severity": "critical", "source_ip": "",
+         "dest_ip": "10.0.1.50", "description": "Reverse shell spawned — /bin/bash -i",
+         "hours_ago": 0.5},
+        {"event_type": "privilege_escalation", "severity": "critical", "source_ip": "",
+         "dest_ip": "10.0.1.50", "description": "sudo to root from unprivileged account",
+         "hours_ago": 0.4},
+        {"event_type": "data_exfiltration", "severity": "critical", "source_ip": "10.0.1.50",
+         "dest_ip": "198.51.100.99", "description": "Large outbound transfer — 2.3 GB to external IP",
+         "hours_ago": 0.3},
+        {"event_type": "lateral_movement", "severity": "high", "source_ip": "10.0.1.50",
+         "dest_ip": "10.0.1.100", "description": "PsExec execution to domain controller",
+         "hours_ago": 6},
+        {"event_type": "lateral_movement", "severity": "high", "source_ip": "10.0.1.50",
+         "dest_ip": "10.0.1.101", "description": "SMB admin share access on file server",
+         "hours_ago": 5},
+        {"event_type": "credential_dump", "severity": "critical", "source_ip": "",
+         "dest_ip": "10.0.1.100", "description": "Mimikatz signature detected in memory",
+         "hours_ago": 5.5},
+        {"event_type": "ransomware", "severity": "critical", "source_ip": "",
+         "dest_ip": "10.0.1.101", "description": "Mass file encryption detected — .locked extension",
+         "hours_ago": 48},
+        {"event_type": "ransomware", "severity": "critical", "source_ip": "",
+         "dest_ip": "10.0.1.101", "description": "Ransom note dropped — README_DECRYPT.txt",
+         "hours_ago": 47.5},
+        {"event_type": "dns_tunnel", "severity": "high", "source_ip": "10.0.1.30",
+         "dest_ip": "192.0.2.99", "description": "Suspicious DNS TXT queries — possible C2 tunnel",
+         "hours_ago": 36},
+        {"event_type": "malware", "severity": "high", "source_ip": "",
+         "dest_ip": "10.0.1.75", "description": "Known trojan signature in downloaded binary",
+         "hours_ago": 60},
+    ]
+
+    for evt in demo_events:
+        ts = (now - timedelta(hours=evt["hours_ago"])).isoformat()
+        db.save_event({
+            "event_type": evt["event_type"],
+            "severity": evt["severity"],
+            "source_ip": evt["source_ip"],
+            "dest_ip": evt.get("dest_ip", ""),
+            "description": evt["description"],
+            "source": "demo",
+            "timestamp": ts,
+            "confidence": 0.85,
+            "mitre_techniques": [],
+        })
+
+    print(f"  Seeded {len(demo_events)} demo events spanning 72 hours")
+    print()
+    print("Demo mode active — dashboard running at http://localhost:8501")
+    print("  (read-only sample data, no real actions will execute)")
+    print()
+
+    subprocess.run([
+        sys.executable, "-m", "streamlit", "run",
+        "src/sentinelforge/dashboard/app.py",
+        "--server.port", "8501",
+    ])
 
 
 def _cmd_seed() -> None:

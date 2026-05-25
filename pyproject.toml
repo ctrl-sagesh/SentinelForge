@@ -7,16 +7,24 @@ name = "sentinelforge"
 version = "0.4.0"
 description = "Autonomous AI Cyber Defense Agent Framework — LangGraph-powered SOC automation with constitutional safety guardrails"
 readme = "README.md"
-license = "MIT"
+license = {text = "MIT"}
 requires-python = ">=3.11"
 authors = [{ name = "Sagesh Adhikari", email = "sageshadhikari@gmail.com" }]
-keywords = ["cybersecurity", "ai-agents", "defense", "soc", "threat-detection"]
+keywords = [
+    "cybersecurity", "ai-agents", "defense", "soc", "threat-detection",
+    "MITRE", "ATT&CK", "LangGraph", "incident-response", "autonomous-agents",
+]
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
     "Intended Audience :: Information Technology",
     "Topic :: Security",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
     "langgraph>=0.2.0",
@@ -47,6 +55,13 @@ anthropic = ["langchain-anthropic>=0.3.0"]
 openai = ["langchain-openai>=0.2.0"]
 dev = ["pytest>=8.0", "pytest-asyncio>=0.24", "ruff>=0.7.0", "mypy>=1.12"]
 all = ["sentinelforge[dashboard,ollama,anthropic,openai,dev]"]
+
+[project.urls]
+Homepage = "https://github.com/ctrl-sagesh/SentinelForge"
+Documentation = "https://github.com/ctrl-sagesh/SentinelForge/blob/main/DEPLOYMENT.md"
+Repository = "https://github.com/ctrl-sagesh/SentinelForge"
+"Bug Tracker" = "https://github.com/ctrl-sagesh/SentinelForge/issues"
+Changelog = "https://github.com/ctrl-sagesh/SentinelForge/releases"
 
 [project.scripts]
 sentinelforge = "sentinelforge.cli:main"

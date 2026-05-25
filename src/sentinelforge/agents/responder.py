@@ -77,6 +77,18 @@ class ResponderAgent(BaseAgent):
                     continue
                 self.logger.info("canary_passed", preview=canary_result.command_preview)
 
+            import os
+            if os.environ.get("SENTINELFORGE_DEMO_MODE") == "true":
+                self.logger.info(
+                    "demo_mode_skip",
+                    action=action.action_type,
+                    target=action.target,
+                )
+                action.status = ActionStatus.EXECUTED
+                action.execution_output = "Demo mode: skipping real execution"
+                state.executed_actions.append(action)
+                continue
+
             if self.settings.simulation_mode:
                 self.logger.info(
                     "simulated_execution",
