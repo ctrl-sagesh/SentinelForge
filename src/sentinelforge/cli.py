@@ -12,6 +12,9 @@ def main() -> None:
         prog="sentinelforge",
         description="SentinelForge — Autonomous AI Cyber Defense Agent Framework",
     )
+    parser.add_argument(
+        "--version", action="version", version="SentinelForge v0.4.0"
+    )
     sub = parser.add_subparsers(dest="command")
 
     run_p = sub.add_parser("run", help="Run a defense cycle")
